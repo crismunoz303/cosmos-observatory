@@ -18,7 +18,6 @@
   </script>
 
   <style>
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -27,8 +26,8 @@
 
     :root {
       --bg: #02060b;
-      --panel: rgba(5, 13, 21, 0.92);
-      --panel-2: rgba(8, 20, 31, 0.9);
+      --panel: rgba(5, 13, 21, 0.94);
+      --panel2: rgba(8, 20, 31, 0.94);
       --line: rgba(96, 194, 255, 0.18);
       --line-strong: rgba(96, 194, 255, 0.48);
       --text: #eaf6ff;
@@ -37,21 +36,23 @@
       --blue: #74a9ff;
       --green: #69ffc1;
       --amber: #ffd36b;
-      --danger: #ff7373;
+      --red: #ff7979;
     }
 
-    html {
-      background: var(--bg);
+    html,
+    body {
       min-height: 100%;
+      background: var(--bg);
     }
 
     body {
-      min-height: 100vh;
+      color: var(--text);
+
       background:
         radial-gradient(
-          circle at 50% 20%,
-          rgba(14, 61, 95, 0.2),
-          transparent 35%
+          circle at 50% 18%,
+          rgba(14, 61, 95, 0.18),
+          transparent 34%
         ),
         linear-gradient(
           180deg,
@@ -59,8 +60,6 @@
           #02060b 55%,
           #010305 100%
         );
-
-      color: var(--text);
 
       font-family:
         -apple-system,
@@ -81,6 +80,7 @@
 
     button {
       -webkit-tap-highlight-color: transparent;
+      cursor: pointer;
     }
 
     .app {
@@ -105,15 +105,16 @@
       top: 0;
       z-index: 100;
 
-      background: rgba(2, 7, 12, 0.88);
+      background: rgba(2, 7, 12, 0.9);
+
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
     }
 
     .brand {
       display: flex;
-      gap: 10px;
       align-items: center;
+      gap: 10px;
       min-width: 0;
     }
 
@@ -125,7 +126,6 @@
       border-radius: 50%;
 
       position: relative;
-
       flex-shrink: 0;
     }
 
@@ -158,11 +158,9 @@
 
     .brand-subtitle {
       margin-top: 2px;
-
       color: var(--muted);
-
       font-size: 7px;
-      letter-spacing: 1.5px;
+      letter-spacing: 1.4px;
     }
 
     .online {
@@ -174,8 +172,6 @@
 
       font-size: 8px;
       letter-spacing: 1.1px;
-
-      white-space: nowrap;
     }
 
     .online-dot {
@@ -199,9 +195,7 @@
     }
 
 
-    /* =========================
-       EARTH HOME SCREEN
-       ========================= */
+    /* EARTH */
 
     .earth-screen {
       position: relative;
@@ -353,25 +347,6 @@
         -42px 5px 60px rgba(0,0,0,.88) inset,
         16px -12px 36px rgba(93,192,255,.11) inset,
         0 0 55px rgba(70,170,255,.14);
-
-      animation: earthPulse 6s ease-in-out infinite;
-    }
-
-    @keyframes earthPulse {
-      0%,
-      100% {
-        box-shadow:
-          -42px 5px 60px rgba(0,0,0,.88) inset,
-          16px -12px 36px rgba(93,192,255,.11) inset,
-          0 0 45px rgba(70,170,255,.12);
-      }
-
-      50% {
-        box-shadow:
-          -42px 5px 60px rgba(0,0,0,.88) inset,
-          16px -12px 36px rgba(93,192,255,.11) inset,
-          0 0 75px rgba(70,170,255,.2);
-      }
     }
 
     .earth::after {
@@ -393,23 +368,18 @@
 
     .earth-name {
       text-align: center;
-
       margin-top: 38px;
     }
 
     .earth-name h1 {
       font-size: clamp(32px, 10vw, 54px);
-
       font-weight: 300;
-
       letter-spacing: 9px;
     }
 
     .earth-name p {
       margin-top: 8px;
-
       color: var(--muted);
-
       font-size: 9px;
       letter-spacing: 2px;
     }
@@ -420,10 +390,7 @@
       padding: 15px 28px;
 
       border-radius: 4px;
-
-      border:
-        1px solid
-        var(--line-strong);
+      border: 1px solid var(--line-strong);
 
       background:
         linear-gradient(
@@ -436,16 +403,6 @@
 
       font-size: 10px;
       letter-spacing: 2px;
-
-      cursor: pointer;
-
-      box-shadow:
-        0 0 24px
-        rgba(104, 220, 255, 0.07);
-    }
-
-    .enter-button:active {
-      transform: scale(.97);
     }
 
     .telemetry {
@@ -463,19 +420,12 @@
     }
 
     .data-box {
-      min-width: 0;
-
       padding: 11px;
 
-      border:
-        1px solid
-        var(--line);
-
+      border: 1px solid var(--line);
       border-radius: 5px;
 
       background: var(--panel);
-
-      backdrop-filter: blur(10px);
     }
 
     .data-box-label {
@@ -495,10 +445,6 @@
         monospace;
 
       font-size: 10px;
-
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .verified {
@@ -506,9 +452,7 @@
     }
 
 
-    /* =========================
-       OBSERVED SKY
-       ========================= */
+    /* SKY */
 
     .sky-screen {
       max-width: 1200px;
@@ -517,7 +461,7 @@
       padding:
         12px
         12px
-        30px;
+        36px;
     }
 
     .sky-heading {
@@ -546,10 +490,7 @@
     .back-button {
       padding: 9px 11px;
 
-      border:
-        1px solid
-        var(--line);
-
+      border: 1px solid var(--line);
       border-radius: 4px;
 
       background: var(--panel);
@@ -558,29 +499,23 @@
 
       font-size: 9px;
       letter-spacing: 1px;
-
-      cursor: pointer;
     }
 
     .sky-toolbar {
-      margin-bottom: 8px;
-
       display: grid;
       grid-template-columns: 1fr auto;
       gap: 7px;
+
+      margin-bottom: 8px;
     }
 
     .target-search {
       width: 100%;
-
       min-width: 0;
 
       padding: 12px;
 
-      border:
-        1px solid
-        var(--line);
-
+      border: 1px solid var(--line);
       border-radius: 5px;
 
       outline: none;
@@ -599,21 +534,15 @@
     .search-button {
       padding: 0 17px;
 
-      border:
-        1px solid
-        var(--line-strong);
-
+      border: 1px solid var(--line-strong);
       border-radius: 5px;
 
-      background:
-        rgba(16, 44, 64, .9);
+      background: rgba(16, 44, 64, .9);
 
       color: var(--cyan);
 
       font-size: 9px;
       letter-spacing: 1.3px;
-
-      cursor: pointer;
     }
 
     .quick-targets {
@@ -622,9 +551,9 @@
 
       overflow-x: auto;
 
-      scrollbar-width: none;
-
       padding-bottom: 8px;
+
+      scrollbar-width: none;
     }
 
     .quick-targets::-webkit-scrollbar {
@@ -636,10 +565,7 @@
 
       padding: 8px 11px;
 
-      border:
-        1px solid
-        var(--line);
-
+      border: 1px solid var(--line);
       border-radius: 4px;
 
       background: var(--panel);
@@ -648,35 +574,25 @@
 
       font-size: 8px;
       letter-spacing: 1px;
-
-      cursor: pointer;
     }
 
-    .target-chip:active {
-      color: var(--cyan);
-      border-color: var(--line-strong);
+    .target-chip.personal {
+      color: var(--green);
+      border-color: rgba(105,255,193,.32);
     }
 
     .map-shell {
       position: relative;
 
-      min-height: 470px;
+      height: 55vh;
+      min-height: 410px;
 
-      height: 58vh;
-
-      border:
-        1px solid
-        rgba(104, 220, 255, 0.28);
-
+      border: 1px solid rgba(104, 220, 255, 0.28);
       border-radius: 7px;
 
       overflow: hidden;
 
       background: #000;
-
-      box-shadow:
-        0 0 30px
-        rgba(0,0,0,.65);
     }
 
     #aladin-lite-div {
@@ -696,14 +612,10 @@
 
       padding: 7px 9px;
 
-      border:
-        1px solid
-        rgba(104, 220, 255, 0.22);
-
+      border: 1px solid rgba(104, 220, 255, 0.22);
       border-radius: 4px;
 
-      background:
-        rgba(2, 8, 14, 0.82);
+      background: rgba(2, 8, 14, 0.82);
 
       color: var(--cyan);
 
@@ -715,8 +627,6 @@
 
       font-size: 7px;
       letter-spacing: 1.2px;
-
-      backdrop-filter: blur(8px);
     }
 
     .map-status {
@@ -732,18 +642,14 @@
 
       padding: 8px 9px;
 
-      border:
-        1px solid
-        rgba(104, 220, 255, 0.2);
-
+      border: 1px solid rgba(104, 220, 255, 0.2);
       border-radius: 4px;
 
       display: flex;
       justify-content: space-between;
       gap: 10px;
 
-      background:
-        rgba(2, 8, 14, 0.85);
+      background: rgba(2, 8, 14, 0.85);
 
       color: var(--muted);
 
@@ -754,14 +660,203 @@
         monospace;
 
       font-size: 7px;
-      line-height: 1.5;
-
-      backdrop-filter: blur(8px);
     }
 
     .map-status .good {
       color: var(--green);
     }
+
+
+    /* MY SKY */
+
+    .section-title {
+      margin: 18px 2px 8px;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section-title-main {
+      color: var(--cyan);
+
+      font-size: 9px;
+      letter-spacing: 2px;
+    }
+
+    .section-title-sub {
+      color: var(--muted);
+
+      font-size: 7px;
+      letter-spacing: 1px;
+    }
+
+    .observation-card {
+      border: 1px solid var(--line);
+      border-radius: 7px;
+
+      background: var(--panel);
+
+      overflow: hidden;
+    }
+
+    .observation-header {
+      padding: 13px;
+
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+
+      border-bottom: 1px solid var(--line);
+    }
+
+    .obs-code {
+      color: var(--green);
+
+      font-size: 7px;
+      letter-spacing: 1.7px;
+    }
+
+    .obs-name {
+      margin-top: 5px;
+
+      font-size: 18px;
+      letter-spacing: 1.4px;
+    }
+
+    .obs-common {
+      margin-top: 4px;
+
+      color: var(--muted);
+
+      font-size: 9px;
+    }
+
+    .obs-status {
+      color: var(--green);
+
+      font-size: 8px;
+      letter-spacing: 1px;
+
+      text-align: right;
+    }
+
+    .image-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+
+      background: var(--line);
+    }
+
+    .image-switch button {
+      border: 0;
+
+      padding: 11px;
+
+      background: #06101a;
+
+      color: var(--muted);
+
+      font-size: 8px;
+      letter-spacing: 1.3px;
+    }
+
+    .image-switch button.active {
+      background: rgba(16, 43, 61, 0.95);
+      color: var(--cyan);
+    }
+
+    .capture-frame {
+      width: 100%;
+
+      background: #000;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      min-height: 380px;
+    }
+
+    .capture-frame img {
+      display: block;
+
+      width: 100%;
+      height: auto;
+
+      max-height: 72vh;
+
+      object-fit: contain;
+
+      background: #000;
+    }
+
+    .metadata-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+
+      gap: 1px;
+
+      background: var(--line);
+
+      border-top: 1px solid var(--line);
+    }
+
+    .meta-box {
+      padding: 12px;
+
+      background: #05101a;
+    }
+
+    .meta-label {
+      color: var(--muted);
+
+      font-size: 7px;
+      letter-spacing: 1.3px;
+
+      margin-bottom: 6px;
+    }
+
+    .meta-value {
+      font-size: 10px;
+
+      line-height: 1.45;
+    }
+
+    .meta-value.source {
+      color: var(--green);
+    }
+
+    .observation-actions {
+      padding: 12px;
+
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .obs-action {
+      padding: 10px;
+
+      border: 1px solid var(--line);
+      border-radius: 4px;
+
+      background: var(--panel2);
+
+      color: var(--muted);
+
+      font-size: 8px;
+      letter-spacing: 1px;
+    }
+
+    .obs-action.primary {
+      color: var(--cyan);
+      border-color: var(--line-strong);
+    }
+
+
+    /* DATA PANELS */
 
     .control-grid {
       display: grid;
@@ -774,12 +869,9 @@
     .control-card {
       padding: 13px;
 
-      min-height: 120px;
+      min-height: 116px;
 
-      border:
-        1px solid
-        var(--line);
-
+      border: 1px solid var(--line);
       border-radius: 6px;
 
       background: var(--panel);
@@ -819,20 +911,15 @@
     .small-button {
       padding: 8px;
 
-      border:
-        1px solid
-        var(--line);
-
+      border: 1px solid var(--line);
       border-radius: 4px;
 
-      background: var(--panel-2);
+      background: var(--panel2);
 
       color: var(--muted);
 
       font-size: 7px;
       letter-spacing: .8px;
-
-      cursor: pointer;
     }
 
     .small-button.active {
@@ -845,10 +932,7 @@
 
       padding: 13px;
 
-      border:
-        1px solid
-        var(--line);
-
+      border: 1px solid var(--line);
       border-radius: 6px;
 
       background: rgba(4, 11, 18, 0.94);
@@ -875,8 +959,8 @@
       font-weight: 500;
     }
 
-    .prototype-note {
-      padding: 18px 8px 4px;
+    .footer-note {
+      padding: 20px 8px 4px;
 
       text-align: center;
 
@@ -888,7 +972,6 @@
     }
 
     @media (min-width: 750px) {
-
       .telemetry {
         grid-template-columns: repeat(4, 1fr);
       }
@@ -897,14 +980,19 @@
         grid-template-columns: repeat(4, 1fr);
       }
 
+      .metadata-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
       .map-shell {
         height: 68vh;
       }
 
+      .capture-frame img {
+        max-height: 80vh;
+      }
     }
-
   </style>
-
 </head>
 
 
@@ -912,8 +1000,6 @@
 
 <div class="app">
 
-
-  <!-- TOP SYSTEM BAR -->
 
   <header class="topbar">
 
@@ -948,9 +1034,7 @@
 
 
 
-  <!-- =========================
-       EARTH SCREEN
-       ========================= -->
+  <!-- EARTH SCREEN -->
 
   <main
     id="earthScreen"
@@ -1071,9 +1155,7 @@
 
 
 
-  <!-- =========================
-       REAL OBSERVED SKY
-       ========================= -->
+  <!-- SKY SCREEN -->
 
   <main
     id="skyScreen"
@@ -1090,7 +1172,7 @@
         </h2>
 
         <p>
-          REAL CELESTIAL SURVEY INTERFACE
+          REAL CELESTIAL SURVEY + PERSONAL OBSERVATIONS
         </p>
 
       </div>
@@ -1109,7 +1191,6 @@
 
     <section class="sky-toolbar">
 
-
       <input
         id="targetSearch"
         class="target-search"
@@ -1118,7 +1199,6 @@
         autocomplete="off"
       >
 
-
       <button
         class="search-button"
         onclick="searchTarget()"
@@ -1126,13 +1206,18 @@
         LOCATE
       </button>
 
-
     </section>
 
 
 
     <section class="quick-targets">
 
+      <button
+        class="target-chip personal"
+        onclick="gotoMyObservation()"
+      >
+        ★ MY NGC 7000
+      </button>
 
       <button
         class="target-chip"
@@ -1141,14 +1226,12 @@
         M31
       </button>
 
-
       <button
         class="target-chip"
         onclick="gotoTarget('M 42', 3)"
       >
         M42
       </button>
-
 
       <button
         class="target-chip"
@@ -1157,14 +1240,12 @@
         M8
       </button>
 
-
       <button
         class="target-chip"
         onclick="gotoTarget('M 45', 5)"
       >
         M45
       </button>
-
 
       <button
         class="target-chip"
@@ -1173,7 +1254,6 @@
         NGC 7000
       </button>
 
-
       <button
         class="target-chip"
         onclick="gotoTarget('M 51', 1)"
@@ -1181,23 +1261,19 @@
         M51
       </button>
 
-
     </section>
 
 
 
     <section class="map-shell">
 
-
       <div class="map-label">
         CDS // ALADIN LITE
       </div>
 
-
       <div
         id="aladin-lite-div"
       ></div>
-
 
       <div class="map-status">
 
@@ -1206,11 +1282,223 @@
         </span>
 
         <span class="good">
-          REAL SKY DATA
+          PERSONAL CAPTURE LAYER ACTIVE
         </span>
 
       </div>
 
+    </section>
+
+
+
+    <div class="section-title">
+
+      <div class="section-title-main">
+        MY SKY // OBSERVATION 001
+      </div>
+
+      <div class="section-title-sub">
+        PERSONAL CAPTURE
+      </div>
+
+    </div>
+
+
+
+    <section
+      id="observationCard"
+      class="observation-card"
+    >
+
+      <div class="observation-header">
+
+        <div>
+
+          <div class="obs-code">
+            OBS-001 // NGC 7000
+          </div>
+
+          <div class="obs-name">
+            NGC 7000
+          </div>
+
+          <div class="obs-common">
+            North America Nebula
+          </div>
+
+        </div>
+
+
+        <div class="obs-status">
+          TARGET VERIFIED
+        </div>
+
+      </div>
+
+
+
+      <div class="image-switch">
+
+        <button
+          id="originalButton"
+          class="active"
+          onclick="showOriginal()"
+        >
+          ORIGINAL
+        </button>
+
+        <button
+          id="processedButton"
+          onclick="showProcessed()"
+        >
+          PROCESSED
+        </button>
+
+      </div>
+
+
+
+      <div class="capture-frame">
+
+        <img
+          id="captureImage"
+          src="IMG_9549.jpeg"
+          alt="User astrophotography observation of NGC 7000"
+        >
+
+      </div>
+
+
+
+      <div class="metadata-grid">
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            TARGET
+          </div>
+
+          <div class="meta-value">
+            NGC 7000
+          </div>
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            COORDINATES
+          </div>
+
+          <div class="meta-value">
+            RA 20h 58m 47.0s<br>
+            Dec +44° 19′ 48″
+          </div>
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            EQUIPMENT
+          </div>
+
+          <div class="meta-value">
+            Seestar S30 Pro
+          </div>
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            COORDINATE SOURCE
+          </div>
+
+          <div class="meta-value source">
+            SIMBAD // CDS
+          </div>
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            CAPTURE DATE
+          </div>
+
+          <div class="meta-value">
+            NOT RECORDED
+          </div>
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            INTEGRATION TIME
+          </div>
+
+          <div class="meta-value">
+            NOT RECORDED
+          </div>
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            ORIGINAL FILE
+          </div>
+
+          <div class="meta-value">
+            IMG_9549.jpeg
+          </div>
+
+        </div>
+
+
+        <div class="meta-box">
+
+          <div class="meta-label">
+            PROCESSED FILE
+          </div>
+
+          <div class="meta-value">
+            image.png
+          </div>
+
+        </div>
+
+
+      </div>
+
+
+
+      <div class="observation-actions">
+
+        <button
+          class="obs-action primary"
+          onclick="gotoMyObservation()"
+        >
+          LOCATE ON SKY
+        </button>
+
+        <button
+          class="obs-action"
+          onclick="scrollToObservation()"
+        >
+          VIEW CAPTURE
+        </button>
+
+      </div>
 
     </section>
 
@@ -1229,11 +1517,11 @@
           id="currentTarget"
           class="control-card-value"
         >
-          M31
+          NGC 7000
         </div>
 
         <div class="control-card-sub">
-          Target names are resolved by the astronomical sky service.
+          Astronomical target resolution handled by Aladin Lite.
         </div>
 
       </article>
@@ -1254,7 +1542,7 @@
         </div>
 
         <div class="control-card-sub">
-          Approximate angular width of the current map view.
+          Angular width of the current sky-map viewport.
         </div>
 
       </article>
@@ -1275,7 +1563,7 @@
 
           <button
             id="gridOnButton"
-            class="small-button active"
+            class="small-button"
             onclick="setGrid(true)"
           >
             GRID ON
@@ -1283,7 +1571,7 @@
 
           <button
             id="gridOffButton"
-            class="small-button"
+            class="small-button active"
             onclick="setGrid(false)"
           >
             GRID OFF
@@ -1298,15 +1586,15 @@
       <article class="control-card">
 
         <div class="control-card-label">
-          SKY SURVEY
+          PERSONAL LAYER
         </div>
 
         <div class="control-card-value">
-          DSS2 COLOR
+          1 OBSERVATION
         </div>
 
         <div class="control-card-sub">
-          Digitized photographic sky survey imagery served through CDS HiPS.
+          Your captured targets are mapped onto the real celestial coordinate system.
         </div>
 
       </article>
@@ -1319,30 +1607,38 @@
     <section class="source-card">
 
       <div class="source-card-title">
-        DATA PROVENANCE // SKY MAP
+        DATA PROVENANCE // NGC 7000
       </div>
 
       <div class="source-card-copy">
 
-        <strong>Viewer:</strong>
-        Aladin Lite
+        <strong>Target identity:</strong>
+        NGC 7000 / North America Nebula
 
         <br>
 
-        <strong>Institution:</strong>
-        CDS — Centre de Données astronomiques de Strasbourg
+        <strong>Coordinates:</strong>
+        SIMBAD astronomical database, CDS Strasbourg
 
         <br>
 
-        <strong>Base survey:</strong>
-        DSS2 color HiPS survey
+        <strong>ICRS J2000:</strong>
+        20h 58m 47.0s, +44° 19′ 48″
 
         <br>
 
-        This interface does not generate stars, galaxies,
-        nebulae, or celestial coordinates.
-        The displayed sky imagery is retrieved from astronomical
-        survey data through Aladin Lite.
+        <strong>Map:</strong>
+        Aladin Lite / CDS
+
+        <br>
+
+        <strong>Survey imagery:</strong>
+        DSS2 Color HiPS
+
+        <br>
+
+        <strong>Personal photography:</strong>
+        User-supplied original and conventionally processed files
 
       </div>
 
@@ -1350,7 +1646,7 @@
 
 
 
-    <div class="prototype-note">
+    <div class="footer-note">
 
       COSMOS OBSERVATORY DATA STANDARD //
       CATALOGUED VALUES ARE SOURCED //
@@ -1375,16 +1671,21 @@
 
   let aladinReady = false;
 
+  let personalCatalog = null;
 
 
-  /* =========================
-     CLOCK + JULIAN DATE
-     ========================= */
+  const NGC7000_RA =
+    314.6958333333;
+
+  const NGC7000_DEC =
+    44.3300000000;
+
 
 
   function updateTimeData() {
 
-    const now = new Date();
+    const now =
+      new Date();
 
 
     const localTime =
@@ -1439,11 +1740,6 @@
 
 
 
-  /* =========================
-     SCREEN NAVIGATION
-     ========================= */
-
-
   function enterSky() {
 
     document
@@ -1459,41 +1755,41 @@
 
 
     window.scrollTo(
-      {
-        top: 0,
-        behavior: "instant"
-      }
+      0,
+      0
     );
 
 
-    if (
-      aladin &&
-      aladinReady
-    ) {
+    setTimeout(
+      function() {
 
-      setTimeout(
-        function() {
+        if (
+          aladin &&
+          aladinReady
+        ) {
 
           try {
 
+            const fov =
+              aladin.getFov();
+
             aladin.setFoV(
-              aladin.getFov()[0]
+              fov[0]
             );
 
           } catch (error) {
 
             console.log(
-              "Map resize refresh:",
               error
             );
 
           }
 
-        },
-        250
-      );
+        }
 
-    }
+      },
+      250
+    );
 
   }
 
@@ -1514,107 +1810,148 @@
 
 
     window.scrollTo(
-      {
-        top: 0,
-        behavior: "instant"
-      }
+      0,
+      0
     );
 
   }
 
 
 
-  /* =========================
-     ALADIN LITE
-     ========================= */
+  A.init
+    .then(
+      function() {
+
+        aladin =
+          A.aladin(
+            "#aladin-lite-div",
+            {
+
+              survey:
+                "P/DSS2/color",
+
+              target:
+                "NGC 7000",
+
+              fov:
+                5,
+
+              cooFrame:
+                "ICRS",
+
+              showReticle:
+                true,
+
+              showCooGrid:
+                false,
+
+              showSimbadPointerControl:
+                true,
+
+              showCooLocation:
+                true,
+
+              showFullscreenControl:
+                true,
+
+              showZoomControl:
+                true,
+
+              showLayersControl:
+                true
+
+            }
+          );
 
 
-  A.init.then(
-    function() {
+        personalCatalog =
+          A.catalog(
+            {
 
-      aladin =
-        A.aladin(
-          "#aladin-lite-div",
-          {
+              name:
+                "My Astrophotography",
 
-            survey:
-              "P/DSS2/color",
+              color:
+                "#69ffc1",
 
-            target:
-              "M 31",
+              sourceSize:
+                22
 
-            fov:
-              4,
+            }
+          );
 
-            cooFrame:
-              "ICRS",
 
-            showReticle:
-              true,
-
-            showCooGrid:
-              true,
-
-            showSimbadPointerControl:
-              true,
-
-            showCooLocation:
-              true,
-
-            showFullscreenControl:
-              true,
-
-            showZoomControl:
-              true,
-
-            showLayersControl:
-              true
-
-          }
+        aladin.addCatalog(
+          personalCatalog
         );
 
 
-      aladinReady = true;
+        const ngc7000Marker =
+          A.marker(
+            NGC7000_RA,
+            NGC7000_DEC,
+            {
+
+              popupTitle:
+                "MY OBSERVATION // NGC 7000",
+
+              popupDesc:
+                "North America Nebula<br>"
+                +
+                "Personal capture: OBS-001<br>"
+                +
+                "Equipment: Seestar S30 Pro<br>"
+                +
+                "Coordinates: SIMBAD / CDS"
+
+            }
+          );
 
 
-      document
-        .getElementById("currentTarget")
-        .textContent =
-        "M31";
+        personalCatalog.addSources(
+          [
+            ngc7000Marker
+          ]
+        );
 
 
-      updateFovDisplay();
+        aladinReady =
+          true;
 
 
-      setInterval(
-        updateFovDisplay,
-        1000
-      );
-
-    }
-  )
-  .catch(
-    function(error) {
-
-      console.error(
-        "Aladin Lite failed to initialize:",
-        error
-      );
+        document
+          .getElementById("currentTarget")
+          .textContent =
+          "NGC 7000";
 
 
-      document
-        .getElementById("currentTarget")
-        .textContent =
-        "SKY MAP ERROR";
-
-    }
-  );
+        updateFovDisplay();
 
 
+        setInterval(
+          updateFovDisplay,
+          1000
+        );
 
-  /* =========================
-     TARGET SEARCH
-     ========================= */
+      }
+    )
+    .catch(
+      function(error) {
+
+        console.error(
+          "Aladin initialization failed:",
+          error
+        );
+
+
+        document
+          .getElementById("currentTarget")
+          .textContent =
+          "SKY MAP ERROR";
+
+      }
+    );
+
 
 
   function searchTarget() {
@@ -1666,6 +2003,7 @@
       aladin.gotoObject(
         target,
         {
+
           success:
             function() {
 
@@ -1697,21 +2035,15 @@
                 "TARGET NOT RESOLVED";
 
             }
+
         }
       );
 
     } catch (error) {
 
       console.error(
-        "Target lookup failed:",
         error
       );
-
-
-      document
-        .getElementById("currentTarget")
-        .textContent =
-        "TARGET ERROR";
 
     }
 
@@ -1719,9 +2051,103 @@
 
 
 
-  /* =========================
-     FIELD OF VIEW
-     ========================= */
+  function gotoMyObservation() {
+
+    if (
+      !aladin ||
+      !aladinReady
+    ) {
+
+      return;
+
+    }
+
+
+    aladin.gotoRaDec(
+      NGC7000_RA,
+      NGC7000_DEC
+    );
+
+
+    aladin.setFoV(
+      5
+    );
+
+
+    document
+      .getElementById("currentTarget")
+      .textContent =
+      "NGC 7000 // MY OBSERVATION";
+
+
+    updateFovDisplay();
+
+  }
+
+
+
+  function scrollToObservation() {
+
+    document
+      .getElementById("observationCard")
+      .scrollIntoView(
+        {
+          behavior:
+            "smooth",
+
+          block:
+            "start"
+        }
+      );
+
+  }
+
+
+
+  function showOriginal() {
+
+    document
+      .getElementById("captureImage")
+      .src =
+      "IMG_9549.jpeg";
+
+
+    document
+      .getElementById("originalButton")
+      .classList
+      .add("active");
+
+
+    document
+      .getElementById("processedButton")
+      .classList
+      .remove("active");
+
+  }
+
+
+
+  function showProcessed() {
+
+    document
+      .getElementById("captureImage")
+      .src =
+      "image.png";
+
+
+    document
+      .getElementById("processedButton")
+      .classList
+      .add("active");
+
+
+    document
+      .getElementById("originalButton")
+      .classList
+      .remove("active");
+
+  }
+
 
 
   function updateFovDisplay() {
@@ -1743,11 +2169,15 @@
 
 
       const horizontal =
-        Number(fov[0]);
+        Number(
+          fov[0]
+        );
 
 
       const vertical =
-        Number(fov[1]);
+        Number(
+          fov[1]
+        );
 
 
       document
@@ -1774,12 +2204,9 @@
 
 
 
-  /* =========================
-     COORDINATE GRID
-     ========================= */
-
-
-  function setGrid(show) {
+  function setGrid(
+    show
+  ) {
 
     if (
       !aladin ||
@@ -1800,7 +2227,6 @@
     } catch (error) {
 
       console.log(
-        "Grid control:",
         error
       );
 
@@ -1845,11 +2271,6 @@
 
 
 
-  /* =========================
-     MOBILE SEARCH KEYBOARD
-     ========================= */
-
-
   document
     .getElementById("targetSearch")
     .addEventListener(
@@ -1871,11 +2292,6 @@
       }
     );
 
-
-
-  /* =========================
-     START SYSTEM CLOCK
-     ========================= */
 
 
   updateTimeData();
