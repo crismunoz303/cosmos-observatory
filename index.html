@@ -2,12 +2,23 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#05080d">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <meta name="theme-color" content="#02060b">
 
   <title>Cosmos Observatory</title>
 
+  <script
+    src="https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js"
+    charset="utf-8">
+  </script>
+
   <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -15,28 +26,42 @@
     }
 
     :root {
-      --bg: #05080d;
-      --panel: rgba(9, 16, 25, 0.88);
-      --panel-light: rgba(15, 26, 39, 0.9);
-      --line: rgba(116, 177, 255, 0.18);
-      --line-strong: rgba(116, 177, 255, 0.45);
-      --text: #e9f2ff;
-      --muted: #7f94aa;
-      --blue: #75b7ff;
-      --cyan: #72e7ff;
-      --green: #77ffc3;
+      --bg: #02060b;
+      --panel: rgba(5, 13, 21, 0.92);
+      --panel-2: rgba(8, 20, 31, 0.9);
+      --line: rgba(96, 194, 255, 0.18);
+      --line-strong: rgba(96, 194, 255, 0.48);
+      --text: #eaf6ff;
+      --muted: #7890a5;
+      --cyan: #68dcff;
+      --blue: #74a9ff;
+      --green: #69ffc1;
+      --amber: #ffd36b;
+      --danger: #ff7373;
     }
 
     html {
       background: var(--bg);
+      min-height: 100%;
     }
 
     body {
       min-height: 100vh;
       background:
-        radial-gradient(circle at 50% 30%, rgba(17, 47, 78, 0.22), transparent 35%),
-        linear-gradient(180deg, #05080d 0%, #020407 100%);
+        radial-gradient(
+          circle at 50% 20%,
+          rgba(14, 61, 95, 0.2),
+          transparent 35%
+        ),
+        linear-gradient(
+          180deg,
+          #030910 0%,
+          #02060b 55%,
+          #010305 100%
+        );
+
       color: var(--text);
+
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -45,11 +70,17 @@
         Helvetica,
         Arial,
         sans-serif;
+
       overflow-x: hidden;
     }
 
-    button {
+    button,
+    input {
       font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
     }
 
     .app {
@@ -57,479 +88,913 @@
     }
 
     .topbar {
-      height: 64px;
-      padding: 0 18px;
+      min-height: 65px;
+
+      padding:
+        calc(10px + env(safe-area-inset-top))
+        16px
+        10px;
+
       border-bottom: 1px solid var(--line);
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: rgba(4, 8, 13, 0.78);
-      backdrop-filter: blur(15px);
-      position: relative;
-      z-index: 20;
+
+      position: sticky;
+      top: 0;
+      z-index: 100;
+
+      background: rgba(2, 7, 12, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
     }
 
     .brand {
       display: flex;
-      align-items: center;
       gap: 10px;
+      align-items: center;
+      min-width: 0;
     }
 
-    .brand-mark {
-      width: 10px;
-      height: 10px;
+    .brand-orbit {
+      width: 27px;
+      height: 27px;
+
+      border: 1px solid rgba(104, 220, 255, 0.55);
       border-radius: 50%;
+
+      position: relative;
+
+      flex-shrink: 0;
+    }
+
+    .brand-orbit::before {
+      content: "";
+
+      position: absolute;
+
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      top: 2px;
+      right: 1px;
+
       background: var(--cyan);
-      box-shadow: 0 0 18px var(--cyan);
+
+      box-shadow:
+        0 0 8px var(--cyan),
+        0 0 18px rgba(104, 220, 255, 0.65);
     }
 
-    .brand-name {
-      font-size: 13px;
-      letter-spacing: 2px;
+    .brand-title {
+      font-size: 12px;
       font-weight: 700;
+      letter-spacing: 1.8px;
+      white-space: nowrap;
     }
 
-    .brand-sub {
-      color: var(--muted);
-      font-size: 9px;
-      letter-spacing: 1.5px;
+    .brand-subtitle {
       margin-top: 2px;
+
+      color: var(--muted);
+
+      font-size: 7px;
+      letter-spacing: 1.5px;
     }
 
-    .status {
+    .online {
       display: flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
+
       color: var(--green);
-      font-size: 10px;
-      letter-spacing: 1.2px;
+
+      font-size: 8px;
+      letter-spacing: 1.1px;
+
+      white-space: nowrap;
     }
 
-    .status-dot {
+    .online-dot {
       width: 6px;
       height: 6px;
+
       background: var(--green);
+
       border-radius: 50%;
-      box-shadow: 0 0 12px var(--green);
+
+      box-shadow: 0 0 10px var(--green);
     }
 
     .screen {
-      min-height: calc(100vh - 64px);
       display: none;
+      min-height: calc(100vh - 65px);
     }
 
     .screen.active {
       display: block;
     }
 
-    /* EARTH SCREEN */
+
+    /* =========================
+       EARTH HOME SCREEN
+       ========================= */
 
     .earth-screen {
       position: relative;
       overflow: hidden;
-      min-height: calc(100vh - 64px);
     }
 
-    .grid {
+    .background-grid {
       position: absolute;
       inset: 0;
-      opacity: 0.28;
+
       background-image:
-        linear-gradient(var(--line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+        linear-gradient(
+          rgba(104, 220, 255, 0.045) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(104, 220, 255, 0.045) 1px,
+          transparent 1px
+        );
+
       background-size: 42px 42px;
-      mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 78%, transparent 100%);
+
+      mask-image:
+        linear-gradient(
+          to bottom,
+          transparent,
+          black 20%,
+          black 80%,
+          transparent
+        );
+
       pointer-events: none;
     }
 
-    .hero {
+    .earth-hero {
+      min-height: calc(100vh - 65px);
+
       position: relative;
       z-index: 2;
-      min-height: calc(100vh - 64px);
+
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      padding: 28px 20px 110px;
+      justify-content: center;
+
+      padding:
+        38px
+        16px
+        180px;
     }
 
-    .eyebrow {
-      font-size: 10px;
+    .section-code {
       color: var(--cyan);
+
+      font-size: 8px;
       letter-spacing: 3px;
-      margin-bottom: 30px;
+
+      margin-bottom: 22px;
     }
 
-    .earth-wrap {
-      width: min(68vw, 290px);
+    .earth-system {
+      width: min(68vw, 300px);
       aspect-ratio: 1;
+
       position: relative;
+
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    .orbit-ring {
+    .outer-ring {
       position: absolute;
-      inset: -24px;
-      border: 1px solid rgba(114, 231, 255, 0.19);
+      inset: -26px;
+
+      border: 1px solid rgba(104, 220, 255, 0.14);
       border-radius: 50%;
     }
 
-    .orbit-ring::before {
+    .outer-ring::after {
       content: "";
-      width: 7px;
-      height: 7px;
+
+      width: 8px;
+      height: 8px;
+
       border-radius: 50%;
+
       background: var(--cyan);
-      box-shadow: 0 0 12px var(--cyan);
+
+      box-shadow:
+        0 0 10px var(--cyan),
+        0 0 22px rgba(104, 220, 255, 0.45);
+
       position: absolute;
-      top: 13%;
-      right: 12%;
+
+      top: 15%;
+      right: 11%;
+    }
+
+    .middle-ring {
+      position: absolute;
+      inset: -10px;
+
+      border:
+        1px dashed
+        rgba(104, 220, 255, 0.14);
+
+      border-radius: 50%;
     }
 
     .earth {
       width: 100%;
       height: 100%;
+
       border-radius: 50%;
+
       position: relative;
+
       background:
-        radial-gradient(circle at 34% 29%, rgba(255,255,255,.2), transparent 5%),
-        radial-gradient(circle at 30% 35%, #396c75 0 8%, transparent 9%),
-        radial-gradient(circle at 62% 48%, #3d766f 0 11%, transparent 12%),
-        radial-gradient(circle at 45% 70%, #244e61 0 8%, transparent 9%),
-        radial-gradient(circle at 40% 36%, #1e597a 0%, #0f3551 55%, #071523 100%);
+        radial-gradient(
+          circle at 31% 28%,
+          rgba(255,255,255,0.18),
+          transparent 5%
+        ),
+        radial-gradient(
+          ellipse at 34% 36%,
+          #397875 0 8%,
+          transparent 9%
+        ),
+        radial-gradient(
+          ellipse at 65% 42%,
+          #315f63 0 10%,
+          transparent 11%
+        ),
+        radial-gradient(
+          ellipse at 48% 67%,
+          #2e675f 0 8%,
+          transparent 9%
+        ),
+        radial-gradient(
+          circle at 42% 39%,
+          #205e85 0%,
+          #123a59 55%,
+          #071522 100%
+        );
+
       box-shadow:
-        -28px 2px 50px rgba(0, 0, 0, 0.85) inset,
-        18px -12px 35px rgba(93, 192, 255, 0.15) inset,
-        0 0 55px rgba(80, 181, 255, 0.15);
+        -42px 5px 60px rgba(0,0,0,.88) inset,
+        16px -12px 36px rgba(93,192,255,.11) inset,
+        0 0 55px rgba(70,170,255,.14);
+
+      animation: earthPulse 6s ease-in-out infinite;
+    }
+
+    @keyframes earthPulse {
+      0%,
+      100% {
+        box-shadow:
+          -42px 5px 60px rgba(0,0,0,.88) inset,
+          16px -12px 36px rgba(93,192,255,.11) inset,
+          0 0 45px rgba(70,170,255,.12);
+      }
+
+      50% {
+        box-shadow:
+          -42px 5px 60px rgba(0,0,0,.88) inset,
+          16px -12px 36px rgba(93,192,255,.11) inset,
+          0 0 75px rgba(70,170,255,.2);
+      }
     }
 
     .earth::after {
       content: "";
+
       position: absolute;
-      inset: -5px;
+      inset: -4px;
+
+      border:
+        1px solid
+        rgba(104, 220, 255, 0.4);
+
       border-radius: 50%;
-      border: 1px solid rgba(117, 183, 255, 0.45);
-      box-shadow: 0 0 18px rgba(117, 183, 255, 0.22);
+
+      box-shadow:
+        0 0 18px
+        rgba(104, 220, 255, 0.18);
     }
 
-    .earth-label {
+    .earth-name {
       text-align: center;
+
       margin-top: 38px;
     }
 
-    .earth-label h1 {
-      font-size: clamp(30px, 9vw, 50px);
-      letter-spacing: 8px;
+    .earth-name h1 {
+      font-size: clamp(32px, 10vw, 54px);
+
       font-weight: 300;
+
+      letter-spacing: 9px;
     }
 
-    .earth-label p {
-      margin-top: 9px;
+    .earth-name p {
+      margin-top: 8px;
+
       color: var(--muted);
-      font-size: 10px;
+
+      font-size: 9px;
       letter-spacing: 2px;
     }
 
     .enter-button {
-      margin-top: 34px;
+      margin-top: 30px;
+
       padding: 15px 28px;
+
       border-radius: 4px;
-      border: 1px solid var(--line-strong);
+
+      border:
+        1px solid
+        var(--line-strong);
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(16, 42, 62, 0.82),
+          rgba(5, 18, 29, 0.92)
+        );
+
       color: var(--text);
-      background: rgba(9, 22, 35, 0.78);
+
+      font-size: 10px;
       letter-spacing: 2px;
-      font-size: 11px;
+
       cursor: pointer;
-      transition: 0.2s ease;
+
+      box-shadow:
+        0 0 24px
+        rgba(104, 220, 255, 0.07);
     }
 
     .enter-button:active {
-      transform: scale(0.97);
-      background: rgba(24, 56, 82, 0.8);
+      transform: scale(.97);
     }
 
     .telemetry {
       position: absolute;
-      bottom: 18px;
-      left: 14px;
-      right: 14px;
+
+      left: 12px;
+      right: 12px;
+      bottom: 16px;
+
+      z-index: 5;
+
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      z-index: 4;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 7px;
     }
 
     .data-box {
       min-width: 0;
-      background: var(--panel);
-      border: 1px solid var(--line);
+
       padding: 11px;
+
+      border:
+        1px solid
+        var(--line);
+
       border-radius: 5px;
+
+      background: var(--panel);
+
+      backdrop-filter: blur(10px);
     }
 
-    .data-label {
+    .data-box-label {
       color: var(--muted);
+
       font-size: 7px;
-      letter-spacing: 1.4px;
+      letter-spacing: 1.3px;
+
       margin-bottom: 7px;
     }
 
-    .data-value {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    .data-box-value {
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+
       font-size: 10px;
-      color: var(--text);
+
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     .verified {
       color: var(--green);
     }
 
-    /* SKY SCREEN */
+
+    /* =========================
+       OBSERVED SKY
+       ========================= */
 
     .sky-screen {
-      min-height: calc(100vh - 64px);
-      padding: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+
+      padding:
+        12px
+        12px
+        30px;
     }
 
-    .sky-header {
+    .sky-heading {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      padding: 8px 4px 16px;
+
+      padding: 7px 2px 14px;
     }
 
-    .sky-header h2 {
+    .sky-heading h2 {
       font-size: 18px;
       letter-spacing: 3px;
       font-weight: 500;
     }
 
-    .sky-header p {
-      margin-top: 6px;
+    .sky-heading p {
+      margin-top: 5px;
+
       color: var(--muted);
-      font-size: 9px;
-      letter-spacing: 1.4px;
+
+      font-size: 8px;
+      letter-spacing: 1.5px;
     }
 
     .back-button {
-      border: 1px solid var(--line);
-      background: var(--panel);
-      color: var(--muted);
+      padding: 9px 11px;
+
+      border:
+        1px solid
+        var(--line);
+
       border-radius: 4px;
-      padding: 9px 12px;
-      font-size: 10px;
-      letter-spacing: 1px;
-    }
 
-    .sky-map {
-      height: 48vh;
-      min-height: 340px;
-      border: 1px solid var(--line);
-      border-radius: 7px;
-      position: relative;
-      overflow: hidden;
-      background:
-        linear-gradient(rgba(117, 183, 255, .06) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(117, 183, 255, .06) 1px, transparent 1px),
-        #03070c;
-      background-size: 36px 36px;
-    }
+      background: var(--panel);
 
-    .coordinate-line-horizontal {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      border-top: 1px dashed rgba(114, 231, 255, 0.21);
-    }
-
-    .coordinate-line-vertical {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      left: 50%;
-      border-left: 1px dashed rgba(114, 231, 255, 0.21);
-    }
-
-    .empty-state {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 35px;
-    }
-
-    .empty-state-inner {
-      max-width: 330px;
-    }
-
-    .crosshair {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 22px;
-      border: 1px solid rgba(114, 231, 255, 0.34);
-      border-radius: 50%;
-      position: relative;
-    }
-
-    .crosshair::before,
-    .crosshair::after {
-      content: "";
-      position: absolute;
-      background: rgba(114, 231, 255, 0.34);
-    }
-
-    .crosshair::before {
-      width: 70px;
-      height: 1px;
-      top: 23px;
-      left: -12px;
-    }
-
-    .crosshair::after {
-      width: 1px;
-      height: 70px;
-      top: -12px;
-      left: 23px;
-    }
-
-    .empty-title {
-      font-size: 13px;
-      letter-spacing: 2px;
-      margin-bottom: 9px;
-    }
-
-    .empty-copy {
       color: var(--muted);
-      font-size: 10px;
-      line-height: 1.7;
-      letter-spacing: 0.5px;
+
+      font-size: 9px;
+      letter-spacing: 1px;
+
+      cursor: pointer;
     }
 
-    .source-bar {
+    .sky-toolbar {
+      margin-bottom: 8px;
+
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 7px;
+    }
+
+    .target-search {
+      width: 100%;
+
+      min-width: 0;
+
+      padding: 12px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 5px;
+
+      outline: none;
+
+      background: rgba(5, 13, 21, .94);
+
+      color: var(--text);
+
+      font-size: 12px;
+    }
+
+    .target-search::placeholder {
+      color: #567086;
+    }
+
+    .search-button {
+      padding: 0 17px;
+
+      border:
+        1px solid
+        var(--line-strong);
+
+      border-radius: 5px;
+
+      background:
+        rgba(16, 44, 64, .9);
+
+      color: var(--cyan);
+
+      font-size: 9px;
+      letter-spacing: 1.3px;
+
+      cursor: pointer;
+    }
+
+    .quick-targets {
+      display: flex;
+      gap: 6px;
+
+      overflow-x: auto;
+
+      scrollbar-width: none;
+
+      padding-bottom: 8px;
+    }
+
+    .quick-targets::-webkit-scrollbar {
+      display: none;
+    }
+
+    .target-chip {
+      flex: 0 0 auto;
+
+      padding: 8px 11px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 4px;
+
+      background: var(--panel);
+
+      color: var(--muted);
+
+      font-size: 8px;
+      letter-spacing: 1px;
+
+      cursor: pointer;
+    }
+
+    .target-chip:active {
+      color: var(--cyan);
+      border-color: var(--line-strong);
+    }
+
+    .map-shell {
+      position: relative;
+
+      min-height: 470px;
+
+      height: 58vh;
+
+      border:
+        1px solid
+        rgba(104, 220, 255, 0.28);
+
+      border-radius: 7px;
+
+      overflow: hidden;
+
+      background: #000;
+
+      box-shadow:
+        0 0 30px
+        rgba(0,0,0,.65);
+    }
+
+    #aladin-lite-div {
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-label {
       position: absolute;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
+
+      top: 9px;
+      left: 9px;
+
+      z-index: 40;
+
+      pointer-events: none;
+
+      padding: 7px 9px;
+
+      border:
+        1px solid
+        rgba(104, 220, 255, 0.22);
+
+      border-radius: 4px;
+
+      background:
+        rgba(2, 8, 14, 0.82);
+
+      color: var(--cyan);
+
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+
+      font-size: 7px;
+      letter-spacing: 1.2px;
+
+      backdrop-filter: blur(8px);
+    }
+
+    .map-status {
+      position: absolute;
+
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+
+      z-index: 40;
+
+      pointer-events: none;
+
+      padding: 8px 9px;
+
+      border:
+        1px solid
+        rgba(104, 220, 255, 0.2);
+
+      border-radius: 4px;
+
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      background: rgba(3, 7, 12, 0.88);
-      border: 1px solid var(--line);
-      border-radius: 4px;
-      padding: 9px 10px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 8px;
+      gap: 10px;
+
+      background:
+        rgba(2, 8, 14, 0.85);
+
       color: var(--muted);
+
+      font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+
+      font-size: 7px;
+      line-height: 1.5;
+
+      backdrop-filter: blur(8px);
     }
 
-    .panels {
+    .map-status .good {
+      color: var(--green);
+    }
+
+    .control-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 9px;
-      margin-top: 9px;
-    }
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
 
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 14px;
-      min-height: 120px;
-    }
-
-    .panel-title {
-      color: var(--cyan);
-      font-size: 8px;
-      letter-spacing: 2px;
-      margin-bottom: 13px;
-    }
-
-    .panel-main {
-      font-size: 13px;
-      letter-spacing: 1px;
-      line-height: 1.45;
-    }
-
-    .panel-sub {
-      color: var(--muted);
-      font-size: 9px;
-      line-height: 1.55;
       margin-top: 8px;
     }
 
-    .footer-note {
-      color: #506276;
+    .control-card {
+      padding: 13px;
+
+      min-height: 120px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 6px;
+
+      background: var(--panel);
+    }
+
+    .control-card-label {
+      margin-bottom: 11px;
+
+      color: var(--cyan);
+
+      font-size: 7px;
+      letter-spacing: 2px;
+    }
+
+    .control-card-value {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .control-card-sub {
+      margin-top: 7px;
+
+      color: var(--muted);
+
+      font-size: 8px;
+      line-height: 1.6;
+    }
+
+    .catalog-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+
+      margin-top: 10px;
+    }
+
+    .small-button {
+      padding: 8px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 4px;
+
+      background: var(--panel-2);
+
+      color: var(--muted);
+
+      font-size: 7px;
+      letter-spacing: .8px;
+
+      cursor: pointer;
+    }
+
+    .small-button.active {
+      color: var(--cyan);
+      border-color: var(--line-strong);
+    }
+
+    .source-card {
+      margin-top: 8px;
+
+      padding: 13px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 6px;
+
+      background: rgba(4, 11, 18, 0.94);
+    }
+
+    .source-card-title {
+      color: var(--green);
+
+      font-size: 8px;
+      letter-spacing: 1.8px;
+
+      margin-bottom: 7px;
+    }
+
+    .source-card-copy {
+      color: var(--muted);
+
       font-size: 8px;
       line-height: 1.7;
-      letter-spacing: .7px;
-      text-align: center;
-      padding: 18px 20px 28px;
     }
 
-    @media (min-width: 800px) {
-      .sky-screen {
-        max-width: 1100px;
-        margin: 0 auto;
-      }
+    .source-card-copy strong {
+      color: var(--text);
+      font-weight: 500;
+    }
 
-      .panels {
+    .prototype-note {
+      padding: 18px 8px 4px;
+
+      text-align: center;
+
+      color: #4f6475;
+
+      font-size: 7px;
+      line-height: 1.8;
+      letter-spacing: .7px;
+    }
+
+    @media (min-width: 750px) {
+
+      .telemetry {
         grid-template-columns: repeat(4, 1fr);
       }
+
+      .control-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .map-shell {
+        height: 68vh;
+      }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
 <div class="app">
 
+
+  <!-- TOP SYSTEM BAR -->
+
   <header class="topbar">
+
     <div class="brand">
-      <div class="brand-mark"></div>
+
+      <div class="brand-orbit"></div>
+
       <div>
-        <div class="brand-name">COSMOS OBSERVATORY</div>
-        <div class="brand-sub">PERSONAL ASTRONOMY SYSTEM</div>
+
+        <div class="brand-title">
+          COSMOS OBSERVATORY
+        </div>
+
+        <div class="brand-subtitle">
+          PERSONAL ASTRONOMY SYSTEM
+        </div>
+
       </div>
+
     </div>
 
-    <div class="status">
-      <div class="status-dot"></div>
-      SYSTEM ONLINE
+
+    <div class="online">
+
+      <div class="online-dot"></div>
+
+      ONLINE
+
     </div>
+
   </header>
 
 
-  <!-- EARTH -->
 
-  <main id="earthScreen" class="screen earth-screen active">
+  <!-- =========================
+       EARTH SCREEN
+       ========================= -->
 
-    <div class="grid"></div>
+  <main
+    id="earthScreen"
+    class="screen earth-screen active"
+  >
 
-    <section class="hero">
+    <div class="background-grid"></div>
 
-      <div class="eyebrow">
+
+    <section class="earth-hero">
+
+      <div class="section-code">
         OBSERVATION ORIGIN
       </div>
 
-      <div class="earth-wrap">
-        <div class="orbit-ring"></div>
+
+      <div class="earth-system">
+
+        <div class="outer-ring"></div>
+
+        <div class="middle-ring"></div>
+
         <div class="earth"></div>
+
       </div>
 
-      <div class="earth-label">
-        <h1>EARTH</h1>
-        <p>SOLAR SYSTEM // MILKY WAY</p>
+
+      <div class="earth-name">
+
+        <h1>
+          EARTH
+        </h1>
+
+        <p>
+          SOL SYSTEM // MILKY WAY
+        </p>
+
       </div>
 
-      <button class="enter-button" onclick="enterSky()">
+
+      <button
+        class="enter-button"
+        onclick="enterSky()"
+      >
         ENTER OBSERVED SKY →
       </button>
 
@@ -538,212 +1003,891 @@
 
     <section class="telemetry">
 
-      <div class="data-box">
-        <div class="data-label">LOCAL TIME</div>
-        <div id="localTime" class="data-value">--:--:--</div>
-      </div>
 
       <div class="data-box">
-        <div class="data-label">UTC</div>
-        <div id="utcTime" class="data-value">--:--:--</div>
+
+        <div class="data-box-label">
+          LOCAL TIME
+        </div>
+
+        <div
+          id="localTime"
+          class="data-box-value"
+        >
+          --:--:--
+        </div>
+
       </div>
 
+
       <div class="data-box">
-        <div class="data-label">DATA POLICY</div>
-        <div class="data-value verified">VERIFIED ONLY</div>
+
+        <div class="data-box-label">
+          UTC
+        </div>
+
+        <div
+          id="utcTime"
+          class="data-box-value"
+        >
+          --:--:--
+        </div>
+
       </div>
+
+
+      <div class="data-box">
+
+        <div class="data-box-label">
+          JULIAN DATE
+        </div>
+
+        <div
+          id="julianDate"
+          class="data-box-value"
+        >
+          --
+        </div>
+
+      </div>
+
+
+      <div class="data-box">
+
+        <div class="data-box-label">
+          DATA POLICY
+        </div>
+
+        <div class="data-box-value verified">
+          VERIFIED ONLY
+        </div>
+
+      </div>
+
 
     </section>
 
   </main>
 
 
-  <!-- SKY -->
 
-  <main id="skyScreen" class="screen sky-screen">
+  <!-- =========================
+       REAL OBSERVED SKY
+       ========================= -->
 
-    <div class="sky-header">
+  <main
+    id="skyScreen"
+    class="screen sky-screen"
+  >
+
+
+    <div class="sky-heading">
 
       <div>
-        <h2>OBSERVED SKY</h2>
-        <p>CELESTIAL DATA INTERFACE</p>
+
+        <h2>
+          OBSERVED SKY
+        </h2>
+
+        <p>
+          REAL CELESTIAL SURVEY INTERFACE
+        </p>
+
       </div>
 
-      <button class="back-button" onclick="returnEarth()">
+
+      <button
+        class="back-button"
+        onclick="returnEarth()"
+      >
         ← EARTH
       </button>
 
     </div>
 
 
-    <section class="sky-map">
 
-      <div class="coordinate-line-horizontal"></div>
-      <div class="coordinate-line-vertical"></div>
+    <section class="sky-toolbar">
 
-      <div class="empty-state">
 
-        <div class="empty-state-inner">
+      <input
+        id="targetSearch"
+        class="target-search"
+        type="text"
+        placeholder="Search target: M31, M42, NGC 7000..."
+        autocomplete="off"
+      >
 
-          <div class="crosshair"></div>
 
-          <div class="empty-title">
-            ASTRONOMICAL CATALOG NOT CONNECTED
-          </div>
+      <button
+        class="search-button"
+        onclick="searchTarget()"
+      >
+        LOCATE
+      </button>
 
-          <div class="empty-copy">
-            This area will become the real celestial map.
-            No stars, targets, coordinates, or astronomical
-            positions are being fabricated for this prototype.
-          </div>
 
-        </div>
+    </section>
+
+
+
+    <section class="quick-targets">
+
+
+      <button
+        class="target-chip"
+        onclick="gotoTarget('M 31', 4)"
+      >
+        M31
+      </button>
+
+
+      <button
+        class="target-chip"
+        onclick="gotoTarget('M 42', 3)"
+      >
+        M42
+      </button>
+
+
+      <button
+        class="target-chip"
+        onclick="gotoTarget('M 8', 3)"
+      >
+        M8
+      </button>
+
+
+      <button
+        class="target-chip"
+        onclick="gotoTarget('M 45', 5)"
+      >
+        M45
+      </button>
+
+
+      <button
+        class="target-chip"
+        onclick="gotoTarget('NGC 7000', 5)"
+      >
+        NGC 7000
+      </button>
+
+
+      <button
+        class="target-chip"
+        onclick="gotoTarget('M 51', 1)"
+      >
+        M51
+      </button>
+
+
+    </section>
+
+
+
+    <section class="map-shell">
+
+
+      <div class="map-label">
+        CDS // ALADIN LITE
+      </div>
+
+
+      <div
+        id="aladin-lite-div"
+      ></div>
+
+
+      <div class="map-status">
+
+        <span>
+          SURVEY // DSS2 COLOR
+        </span>
+
+        <span class="good">
+          REAL SKY DATA
+        </span>
 
       </div>
 
-      <div class="source-bar">
-        <span>SKY DATA // PENDING CONNECTION</span>
-        <span>NO SYNTHETIC OBJECTS</span>
+
+    </section>
+
+
+
+    <section class="control-grid">
+
+
+      <article class="control-card">
+
+        <div class="control-card-label">
+          CURRENT TARGET
+        </div>
+
+        <div
+          id="currentTarget"
+          class="control-card-value"
+        >
+          M31
+        </div>
+
+        <div class="control-card-sub">
+          Target names are resolved by the astronomical sky service.
+        </div>
+
+      </article>
+
+
+
+      <article class="control-card">
+
+        <div class="control-card-label">
+          FIELD OF VIEW
+        </div>
+
+        <div
+          id="currentFov"
+          class="control-card-value"
+        >
+          --
+        </div>
+
+        <div class="control-card-sub">
+          Approximate angular width of the current map view.
+        </div>
+
+      </article>
+
+
+
+      <article class="control-card">
+
+        <div class="control-card-label">
+          COORDINATE GRID
+        </div>
+
+        <div class="control-card-value">
+          ICRS / J2000
+        </div>
+
+        <div class="catalog-buttons">
+
+          <button
+            id="gridOnButton"
+            class="small-button active"
+            onclick="setGrid(true)"
+          >
+            GRID ON
+          </button>
+
+          <button
+            id="gridOffButton"
+            class="small-button"
+            onclick="setGrid(false)"
+          >
+            GRID OFF
+          </button>
+
+        </div>
+
+      </article>
+
+
+
+      <article class="control-card">
+
+        <div class="control-card-label">
+          SKY SURVEY
+        </div>
+
+        <div class="control-card-value">
+          DSS2 COLOR
+        </div>
+
+        <div class="control-card-sub">
+          Digitized photographic sky survey imagery served through CDS HiPS.
+        </div>
+
+      </article>
+
+
+    </section>
+
+
+
+    <section class="source-card">
+
+      <div class="source-card-title">
+        DATA PROVENANCE // SKY MAP
+      </div>
+
+      <div class="source-card-copy">
+
+        <strong>Viewer:</strong>
+        Aladin Lite
+
+        <br>
+
+        <strong>Institution:</strong>
+        CDS — Centre de Données astronomiques de Strasbourg
+
+        <br>
+
+        <strong>Base survey:</strong>
+        DSS2 color HiPS survey
+
+        <br>
+
+        This interface does not generate stars, galaxies,
+        nebulae, or celestial coordinates.
+        The displayed sky imagery is retrieved from astronomical
+        survey data through Aladin Lite.
+
       </div>
 
     </section>
 
 
-    <section class="panels">
 
-      <article class="panel">
-        <div class="panel-title">
-          YOUR CAPTURES
-        </div>
+    <div class="prototype-note">
 
-        <div class="panel-main">
-          Observation archive
-        </div>
-
-        <div class="panel-sub">
-          Your photographs will appear at their measured or catalogued celestial coordinates.
-        </div>
-      </article>
-
-
-      <article class="panel">
-        <div class="panel-title">
-          SOLAR SYSTEM
-        </div>
-
-        <div class="panel-main">
-          Ephemeris data
-        </div>
-
-        <div class="panel-sub">
-          Planet and Solar System positions will use authoritative astronomical calculations.
-        </div>
-      </article>
-
-
-      <article class="panel">
-        <div class="panel-title">
-          SMALL BODIES
-        </div>
-
-        <div class="panel-main">
-          Asteroids & comets
-        </div>
-
-        <div class="panel-sub">
-          Orbital and close-approach information will be connected to verified scientific sources.
-        </div>
-      </article>
-
-
-      <article class="panel">
-        <div class="panel-title">
-          OBSERVATION LOG
-        </div>
-
-        <div class="panel-main">
-          Seestar sessions
-        </div>
-
-        <div class="panel-sub">
-          Capture dates, integration time, equipment, processing history, and personal notes.
-        </div>
-      </article>
-
-    </section>
-
-
-    <div class="footer-note">
       COSMOS OBSERVATORY DATA STANDARD //
       CATALOGUED VALUES ARE SOURCED //
       CALCULATED VALUES ARE REPRODUCIBLE //
       ESTIMATES ARE LABELED //
-      UNKNOWN DATA REMAINS UNKNOWN
+      UNKNOWN DATA REMAINS UNKNOWN //
+      NO GENERATIVE ASTRONOMICAL DATA
+
     </div>
 
+
   </main>
+
 
 </div>
 
 
+
 <script>
 
-  function updateClock() {
+  let aladin = null;
+
+  let aladinReady = false;
+
+
+
+  /* =========================
+     CLOCK + JULIAN DATE
+     ========================= */
+
+
+  function updateTimeData() {
 
     const now = new Date();
 
-    const local = now.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
-    });
 
-    const utc =
-      String(now.getUTCHours()).padStart(2, "0") + ":" +
-      String(now.getUTCMinutes()).padStart(2, "0") + ":" +
-      String(now.getUTCSeconds()).padStart(2, "0");
+    const localTime =
+      now.toLocaleTimeString(
+        [],
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        }
+      );
 
-    document.getElementById("localTime").textContent = local;
-    document.getElementById("utcTime").textContent = utc;
+
+    const utcTime =
+      String(now.getUTCHours())
+        .padStart(2, "0")
+      + ":"
+      + String(now.getUTCMinutes())
+        .padStart(2, "0")
+      + ":"
+      + String(now.getUTCSeconds())
+        .padStart(2, "0");
+
+
+    const julianDate =
+      (
+        now.getTime() /
+        86400000
+      )
+      +
+      2440587.5;
+
+
+    document
+      .getElementById("localTime")
+      .textContent =
+      localTime;
+
+
+    document
+      .getElementById("utcTime")
+      .textContent =
+      utcTime;
+
+
+    document
+      .getElementById("julianDate")
+      .textContent =
+      julianDate.toFixed(5);
 
   }
+
+
+
+  /* =========================
+     SCREEN NAVIGATION
+     ========================= */
 
 
   function enterSky() {
 
     document
       .getElementById("earthScreen")
-      .classList.remove("active");
+      .classList
+      .remove("active");
+
 
     document
       .getElementById("skyScreen")
-      .classList.add("active");
+      .classList
+      .add("active");
 
-    window.scrollTo(0, 0);
+
+    window.scrollTo(
+      {
+        top: 0,
+        behavior: "instant"
+      }
+    );
+
+
+    if (
+      aladin &&
+      aladinReady
+    ) {
+
+      setTimeout(
+        function() {
+
+          try {
+
+            aladin.setFoV(
+              aladin.getFov()[0]
+            );
+
+          } catch (error) {
+
+            console.log(
+              "Map resize refresh:",
+              error
+            );
+
+          }
+
+        },
+        250
+      );
+
+    }
 
   }
+
 
 
   function returnEarth() {
 
     document
       .getElementById("skyScreen")
-      .classList.remove("active");
+      .classList
+      .remove("active");
+
 
     document
       .getElementById("earthScreen")
-      .classList.add("active");
+      .classList
+      .add("active");
 
-    window.scrollTo(0, 0);
+
+    window.scrollTo(
+      {
+        top: 0,
+        behavior: "instant"
+      }
+    );
 
   }
 
 
-  updateClock();
 
-  setInterval(updateClock, 1000);
+  /* =========================
+     ALADIN LITE
+     ========================= */
+
+
+  A.init.then(
+    function() {
+
+      aladin =
+        A.aladin(
+          "#aladin-lite-div",
+          {
+
+            survey:
+              "P/DSS2/color",
+
+            target:
+              "M 31",
+
+            fov:
+              4,
+
+            cooFrame:
+              "ICRS",
+
+            showReticle:
+              true,
+
+            showCooGrid:
+              true,
+
+            showSimbadPointerControl:
+              true,
+
+            showCooLocation:
+              true,
+
+            showFullscreenControl:
+              true,
+
+            showZoomControl:
+              true,
+
+            showLayersControl:
+              true
+
+          }
+        );
+
+
+      aladinReady = true;
+
+
+      document
+        .getElementById("currentTarget")
+        .textContent =
+        "M31";
+
+
+      updateFovDisplay();
+
+
+      setInterval(
+        updateFovDisplay,
+        1000
+      );
+
+    }
+  )
+  .catch(
+    function(error) {
+
+      console.error(
+        "Aladin Lite failed to initialize:",
+        error
+      );
+
+
+      document
+        .getElementById("currentTarget")
+        .textContent =
+        "SKY MAP ERROR";
+
+    }
+  );
+
+
+
+  /* =========================
+     TARGET SEARCH
+     ========================= */
+
+
+  function searchTarget() {
+
+    const field =
+      document
+        .getElementById("targetSearch");
+
+
+    const target =
+      field
+        .value
+        .trim();
+
+
+    if (!target) {
+
+      return;
+
+    }
+
+
+    gotoTarget(
+      target,
+      3
+    );
+
+  }
+
+
+
+  function gotoTarget(
+    target,
+    fov
+  ) {
+
+    if (
+      !aladin ||
+      !aladinReady
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+      aladin.gotoObject(
+        target,
+        {
+          success:
+            function() {
+
+              document
+                .getElementById("currentTarget")
+                .textContent =
+                target.toUpperCase();
+
+
+              if (fov) {
+
+                aladin.setFoV(
+                  fov
+                );
+
+              }
+
+
+              updateFovDisplay();
+
+            },
+
+          error:
+            function() {
+
+              document
+                .getElementById("currentTarget")
+                .textContent =
+                "TARGET NOT RESOLVED";
+
+            }
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Target lookup failed:",
+        error
+      );
+
+
+      document
+        .getElementById("currentTarget")
+        .textContent =
+        "TARGET ERROR";
+
+    }
+
+  }
+
+
+
+  /* =========================
+     FIELD OF VIEW
+     ========================= */
+
+
+  function updateFovDisplay() {
+
+    if (
+      !aladin ||
+      !aladinReady
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+      const fov =
+        aladin.getFov();
+
+
+      const horizontal =
+        Number(fov[0]);
+
+
+      const vertical =
+        Number(fov[1]);
+
+
+      document
+        .getElementById("currentFov")
+        .textContent =
+        horizontal.toFixed(2)
+        +
+        "° × "
+        +
+        vertical.toFixed(2)
+        +
+        "°";
+
+    } catch (error) {
+
+      document
+        .getElementById("currentFov")
+        .textContent =
+        "--";
+
+    }
+
+  }
+
+
+
+  /* =========================
+     COORDINATE GRID
+     ========================= */
+
+
+  function setGrid(show) {
+
+    if (
+      !aladin ||
+      !aladinReady
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+      aladin.setCooGrid(
+        show
+      );
+
+    } catch (error) {
+
+      console.log(
+        "Grid control:",
+        error
+      );
+
+    }
+
+
+    const onButton =
+      document
+        .getElementById("gridOnButton");
+
+
+    const offButton =
+      document
+        .getElementById("gridOffButton");
+
+
+    if (show) {
+
+      onButton
+        .classList
+        .add("active");
+
+
+      offButton
+        .classList
+        .remove("active");
+
+    } else {
+
+      offButton
+        .classList
+        .add("active");
+
+
+      onButton
+        .classList
+        .remove("active");
+
+    }
+
+  }
+
+
+
+  /* =========================
+     MOBILE SEARCH KEYBOARD
+     ========================= */
+
+
+  document
+    .getElementById("targetSearch")
+    .addEventListener(
+      "keydown",
+      function(event) {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          event.preventDefault();
+
+          searchTarget();
+
+          this.blur();
+
+        }
+
+      }
+    );
+
+
+
+  /* =========================
+     START SYSTEM CLOCK
+     ========================= */
+
+
+  updateTimeData();
+
+
+  setInterval(
+    updateTimeData,
+    1000
+  );
 
 </script>
+
 
 </body>
 </html>
