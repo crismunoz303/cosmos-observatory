@@ -6,47 +6,43 @@ final class ObservatoryStore: ObservableObject {
     @Published private(set) var isLoading = false
     @Published private(set) var lastUpdated: Date?
     @Published private(set) var errors: [String] = []
+    @Published private(set) var successfulSources: [String] = []
 
     private let service = RSSFeedService()
 
-    // Supernovae are separated from general astronomy discoveries.
     var supernovaItems: [FeedItem] {
         items.filter {
             let text = ($0.title + " " + $0.summary).lowercased()
             return ["supernova", "super-nova", "type ia", "type ii", "type ib", "type ic",
-                    "stellar explosion", "core-collapse", "kilonova", "superluminous"]
-                .contains(where: text.contains)
+                    "stellar explosion", "core-collapse", "kilonova", "superluminous",
+                    "sn 20", "sn20"].contains(where: text.contains)
         }
     }
 
-    // Only retain stories with an actual science/astronomy subject.
-    // Routine agency announcements and unrelated Earth/administrative news are excluded.
+    // arXiv astrophysics category feeds are already scoped to astronomy research.
+    // Agency/journal stories must earn inclusion through their headline, not boilerplate abstracts.
     var discoveryItems: [FeedItem] {
-        let scienceTerms = [
+        let terms = [
             "exoplanet", "planet", "black hole", "neutron star", "pulsar", "magnetar",
-            "supernova", "super-nova", "star", "stellar", "galaxy", "galaxies",
-            "nebula", "cosmic", "universe", "dark matter", "dark energy", "gravitational wave",
-            "gravitational lens", "quasar", "asteroid", "comet", "meteor", "moon",
-            "mars", "jupiter", "saturn", "uranus", "neptune", "telescope", "jwst",
-            "james webb", "hubble", "chandra", "euclid", "ariel", "planetary science",
-            "solar system", "interstellar", "milky way", "cosmology", "astronomer"
+            "supernova", "super-nova", "stellar", "star ", "stars", "galaxy", "galaxies",
+            "nebula", "cosmic", "universe", "dark matter", "dark energy", "gravitational",
+            "quasar", "asteroid", "comet", "meteor", "moon", "mars", "jupiter", "saturn",
+            "uranus", "neptune", "telescope", "jwst", "james webb", "hubble", "chandra",
+            "euclid", "solar system", "interstellar", "milky way", "cosmology", "astronomy",
+            "planetary", "solar flare", "solar wind", "gamma-ray", "fast radio burst"
         ]
-        let announcementTerms = [
+        let excluded = [
             "invites media", "welcome home", "welcomes home", "join us", "public event",
-            "media event", "watch live", "launch coverage", "launching today",
-            "press conference", "administrator", "headquarters", "job opening",
+            "media event", "watch live", "launch coverage", "press conference", "job opening",
             "procurement", "contract award", "student challenge", "application deadline",
-            "registration open", "celebration", "commemorate", "anniversary"
+            "registration open", "anniversary", "meeting of", "statement on"
         ]
 
         return items.filter { item in
-            let title = item.title.lowercased()
-            let text = (item.title + " " + item.summary).lowercased()
-            guard scienceTerms.contains(where: text.contains) else { return false }
-            // A science keyword in boilerplate copy is not enough: reject obvious event/admin headlines.
-            if announcementTerms.contains(where: title.contains) { return false }
-            if item.summary.lowercased().contains("today's apod archive submissions index") { return false }
-            return true
+            let headline = item.title.lowercased()
+            if excluded.contains(where: headline.contains) { return false }
+            if item.source.hasPrefix("arXiv") { return true }
+            return terms.contains(where: headline.contains)
         }
     }
 
@@ -54,22 +50,28 @@ final class ObservatoryStore: ObservableObject {
         guard !isLoading else { return }
         isLoading = true
         errors = []
+        successfulSources = []
         defer { isLoading = false }
 
         var collected: [FeedItem] = []
         for source in ObservatorySources.all {
             do {
-                collected.append(contentsOf: try await service.load(source))
+                let loaded = try await service.load(source)
+                collected.append(contentsOf: loaded)
+                successfulSources.append("\(source.name) (\(loaded.count))")
             } catch {
                 errors.append("\(source.name): \(error.localizedDescription)")
             }
         }
 
-        var seen = Set<String>()
-        items = collected
-            .sorted { ($0.published ?? .distantPast) > ($1.published ?? .distantPast) }
-            .filter { seen.insert($0.id).inserted }
-        lastUpdated = Date()
+        // Never erase a previously loaded feed just because every publisher is temporarily down.
+        if !successfulSources.isEmpty {
+            var seen = Set<String>()
+            items = collected
+                .sorted { ($0.published ?? .distantPast) > ($1.published ?? .distantPast) }
+                .filter { seen.insert($0.id).inserted }
+            lastUpdated = Date()
+        }
     }
 }
 
@@ -86,13 +88,19 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
 
     func load(_ source: FeedSource) async throws -> [FeedItem] {
         var request = URLRequest(url: source.url)
-        request.timeoutInterval = 18
-        request.setValue("SupernovaWatch/1.0 (iOS)", forHTTPHeaderField: "User-Agent")
+        request.timeoutInterval = 22
+        request.setValue("SupernovaWatch/1.1 (iOS; astronomy research reader)", forHTTPHeaderField: "User-Agent")
+        request.setValue("application/rss+xml, application/atom+xml, application/xml, text/xml", forHTTPHeaderField: "Accept")
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
             throw URLError(.badServerResponse)
         }
-        return parse(data, source: source)
+        guard let first = data.first, first == 60 || first == 239 else {
+            throw URLError(.cannotParseResponse)
+        }
+        let result = parse(data, source: source)
+        guard !result.isEmpty else { throw URLError(.cannotParseResponse) }
+        return result
     }
 
     private func parse(_ data: Data, source: FeedSource) -> [FeedItem] {
@@ -100,6 +108,7 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
         parsed = []
         let parser = XMLParser(data: data)
         parser.delegate = self
+        parser.shouldResolveExternalEntities = false
         _ = parser.parse()
         return parsed
     }
@@ -113,7 +122,8 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
             title = ""; summary = ""; link = ""; guid = ""; pubDate = ""
         }
         if currentElement == "link", let href = attributeDict["href"], !href.isEmpty {
-            link = href
+            let rel = attributeDict["rel"]?.lowercased() ?? "alternate"
+            if rel == "alternate" || link.isEmpty { link = href }
         }
     }
 
@@ -139,24 +149,32 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
                   !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
             let cleanTitle = title.cleanedFeedText
             let cleanSummary = summary.cleanedFeedText
-            // RSS descriptions sometimes contain site navigation, archive links, and footer copy.
-            // Do not show those fragments as if they were article summaries.
             let boilerplate = ["archive submissions index", "search calendar rss", "education about discuss",
-                               "astronomy picture of the day", "subscribe to our newsletter"]
+                               "subscribe to our newsletter", "skip to main content"]
             let usefulSummary = boilerplate.contains(where: cleanSummary.lowercased().contains) ? "" : cleanSummary
             let rawDate = pubDate.trimmingCharacters(in: .whitespacesAndNewlines)
-            let date = ISO8601DateFormatter().date(from: rawDate)
-                ?? DateFormatter.rssDate.date(from: rawDate)
-            let identity = guid.isEmpty ? url.absoluteString : guid
+            let date = FeedDateParser.parse(rawDate)
+            let identity = guid.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? url.absoluteString : guid
             parsed.append(FeedItem(
                 id: identity,
                 title: cleanTitle,
-                summary: String(usefulSummary.prefix(420)),
+                summary: String(usefulSummary.prefix(600)),
                 link: url,
                 source: source.name,
                 published: date
             ))
         }
+    }
+}
+
+private enum FeedDateParser {
+    static func parse(_ value: String) -> Date? {
+        guard !value.isEmpty else { return nil }
+        let iso = ISO8601DateFormatter()
+        if let date = iso.date(from: value) { return date }
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        if let date = iso.date(from: value) { return date }
+        return DateFormatter.rssDate.date(from: value)
     }
 }
 
