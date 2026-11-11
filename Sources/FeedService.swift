@@ -9,11 +9,44 @@ final class ObservatoryStore: ObservableObject {
 
     private let service = RSSFeedService()
 
+    // Supernovae are separated from general astronomy discoveries.
     var supernovaItems: [FeedItem] {
         items.filter {
             let text = ($0.title + " " + $0.summary).lowercased()
-            return ["supernova", "super-nova", "type ia", "type ii", "transient", "stellar explosion", "kilonova"]
+            return ["supernova", "super-nova", "type ia", "type ii", "type ib", "type ic",
+                    "stellar explosion", "core-collapse", "kilonova", "superluminous"]
                 .contains(where: text.contains)
+        }
+    }
+
+    // Only retain stories with an actual science/astronomy subject.
+    // Routine agency announcements and unrelated Earth/administrative news are excluded.
+    var discoveryItems: [FeedItem] {
+        let scienceTerms = [
+            "exoplanet", "planet", "black hole", "neutron star", "pulsar", "magnetar",
+            "supernova", "super-nova", "star", "stellar", "galaxy", "galaxies",
+            "nebula", "cosmic", "universe", "dark matter", "dark energy", "gravitational wave",
+            "gravitational lens", "quasar", "asteroid", "comet", "meteor", "moon",
+            "mars", "jupiter", "saturn", "uranus", "neptune", "telescope", "jwst",
+            "james webb", "hubble", "chandra", "euclid", "ariel", "planetary science",
+            "solar system", "interstellar", "milky way", "cosmology", "astronomer"
+        ]
+        let announcementTerms = [
+            "invites media", "welcome home", "welcomes home", "join us", "public event",
+            "media event", "watch live", "launch coverage", "launching today",
+            "press conference", "administrator", "headquarters", "job opening",
+            "procurement", "contract award", "student challenge", "application deadline",
+            "registration open", "celebration", "commemorate", "anniversary"
+        ]
+
+        return items.filter { item in
+            let title = item.title.lowercased()
+            let text = (item.title + " " + item.summary).lowercased()
+            guard scienceTerms.contains(where: text.contains) else { return false }
+            // A science keyword in boilerplate copy is not enough: reject obvious event/admin headlines.
+            if announcementTerms.contains(where: title.contains) { return false }
+            if item.summary.lowercased().contains("today's apod archive submissions index") { return false }
+            return true
         }
     }
 
@@ -65,7 +98,6 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
     private func parse(_ data: Data, source: FeedSource) -> [FeedItem] {
         currentSource = source
         parsed = []
-        XMLParser(data: data).delegate = self
         let parser = XMLParser(data: data)
         parser.delegate = self
         _ = parser.parse()
@@ -75,7 +107,7 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
     func parser(_ parser: XMLParser, didStartElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?,
                 attributes attributeDict: [String: String] = [:]) {
-        currentElement = elementName.lowercased()
+        currentElement = (qName ?? elementName).lowercased()
         if currentElement == "item" || currentElement == "entry" {
             insideItem = true
             title = ""; summary = ""; link = ""; guid = ""; pubDate = ""
@@ -89,7 +121,7 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
         guard insideItem else { return }
         switch currentElement {
         case "title": title += string
-        case "description", "summary", "content:encoded": summary += string
+        case "description", "summary", "content:encoded", "content": summary += string
         case "link": link += string
         case "guid", "id": guid += string
         case "pubdate", "published", "updated", "dc:date": pubDate += string
@@ -99,20 +131,27 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
 
     func parser(_ parser: XMLParser, didEndElement elementName: String,
                 namespaceURI: String?, qualifiedName qName: String?) {
-        let name = elementName.lowercased()
+        let name = (qName ?? elementName).lowercased()
         if name == "item" || name == "entry" {
             insideItem = false
             guard let source = currentSource,
                   let url = URL(string: link.trimmingCharacters(in: .whitespacesAndNewlines)),
                   !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+            let cleanTitle = title.cleanedFeedText
+            let cleanSummary = summary.cleanedFeedText
+            // RSS descriptions sometimes contain site navigation, archive links, and footer copy.
+            // Do not show those fragments as if they were article summaries.
+            let boilerplate = ["archive submissions index", "search calendar rss", "education about discuss",
+                               "astronomy picture of the day", "subscribe to our newsletter"]
+            let usefulSummary = boilerplate.contains(where: cleanSummary.lowercased().contains) ? "" : cleanSummary
             let rawDate = pubDate.trimmingCharacters(in: .whitespacesAndNewlines)
             let date = ISO8601DateFormatter().date(from: rawDate)
                 ?? DateFormatter.rssDate.date(from: rawDate)
             let identity = guid.isEmpty ? url.absoluteString : guid
             parsed.append(FeedItem(
                 id: identity,
-                title: title.trimmingCharacters(in: .whitespacesAndNewlines),
-                summary: summary.strippingHTML,
+                title: cleanTitle,
+                summary: String(usefulSummary.prefix(420)),
                 link: url,
                 source: source.name,
                 published: date
@@ -132,14 +171,19 @@ private extension DateFormatter {
 }
 
 private extension String {
-    var strippingHTML: String {
+    var cleanedFeedText: String {
         let noTags = replacingOccurrences(of: "<[^>]+>", with: " ", options: .regularExpression)
-        return noTags
+        let decoded = noTags
             .replacingOccurrences(of: "&amp;", with: "&")
             .replacingOccurrences(of: "&quot;", with: "\"")
             .replacingOccurrences(of: "&#39;", with: "'")
             .replacingOccurrences(of: "&lt;", with: "<")
             .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&#8217;", with: "'")
+            .replacingOccurrences(of: "&#8211;", with: "–")
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+        return decoded
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
