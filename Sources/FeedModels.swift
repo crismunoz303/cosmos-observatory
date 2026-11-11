@@ -43,12 +43,6 @@ enum ObservatorySources {
             category: "Space science"
         ),
         FeedSource(
-            id: "nasa-news",
-            name: "NASA News",
-            url: URL(string: "https://www.nasa.gov/news-release/feed/")!,
-            category: "Agency news"
-        ),
-        FeedSource(
             id: "esa-space",
             name: "ESA Space News",
             url: URL(string: "https://www.esa.int/rssfeed/Our_Activities/Space_News")!,
