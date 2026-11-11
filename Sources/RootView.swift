@@ -13,7 +13,7 @@ struct RootView: View {
                     switch selected {
                     case .watch: WatchScreen()
                     case .supernovae: FeedScreen(title: "Supernova Watch", subtitle: "Reported supernovae and stellar transients", items: store.supernovaItems, empty: "No matching supernova reports in the connected feeds yet.")
-                    case .discoveries: FeedScreen(title: "Space Discoveries", subtitle: "New science from NASA and ESA", items: store.items, empty: "No feed items loaded. Pull to refresh.")
+                    case .discoveries: FeedScreen(title: "Space Discoveries", subtitle: "Astronomy, astrophysics & major mission findings", items: store.discoveryItems, empty: "No qualifying astronomy discoveries in the latest publisher feeds. Refresh later; routine agency announcements are filtered out.")
                     case .sources: SourcesScreen()
                     }
                 }
