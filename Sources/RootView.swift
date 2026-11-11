@@ -105,7 +105,7 @@ struct WatchScreen: View {
 
                 HStack(spacing: 10) {
                     StatusTile(label: "LIVE ALERTS", value: "NOT CONNECTED", color: .orange)
-                    StatusTile(label: "FEED ITEMS", value: "\(store.items.count)", color: .cyan)
+                    StatusTile(label: "SCIENCE STORIES", value: "\(store.discoveryItems.count)", color: .cyan)
                 }
 
                 VStack(alignment: .leading, spacing: 10) {
@@ -131,9 +131,9 @@ struct WatchScreen: View {
                 .padding(16).cardStyle()
 
                 VStack(alignment: .leading, spacing: 9) {
-                    SectionHeading(title: "LATEST SUPERNOVA REPORTS", caption: "FILTERED FROM CONNECTED PUBLISHERS")
+                    SectionHeading(title: "LATEST SUPERNOVA REPORTS", caption: "NASA, ESA & ASTROPHYSICS RESEARCH FEEDS")
                     if store.supernovaItems.isEmpty {
-                        Text("No matching reports in the currently connected feeds. This is not evidence that no supernovae have occurred.")
+                        Text(store.isLoading ? "Checking official observatory and astrophysics research feeds…" : (store.errors.isEmpty ? "No supernova-specific report in the latest retrieved items. General astronomy research is available in Discoveries." : "Feed connection issue: " + store.errors.joined(separator: " • ")))
                             .font(.system(size: 12)).foregroundStyle(.white.opacity(0.62))
                     } else {
                         ForEach(store.supernovaItems.prefix(3)) { item in FeedRow(item: item) }
