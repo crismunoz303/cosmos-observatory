@@ -44,13 +44,20 @@ jobs:
 
       - name: Package unsigned IPA
         run: |
-          APP_PATH="build/DerivedData/Build/Products/Release-iphoneos/SupernovaWatch.app"
-          test -d "$APP_PATH"
+          PRODUCTS_DIR="build/DerivedData/Build/Products/Release-iphoneos"
+          APP_PATH="$(find "$PRODUCTS_DIR" -maxdepth 1 -type d -name '*.app' -print -quit)"
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app bundle found in $PRODUCTS_DIR"
+            ls -la "$PRODUCTS_DIR"
+            exit 1
+          fi
+          echo "Packaging: $APP_PATH"
           mkdir -p build/Payload
-          cp -R "$APP_PATH" build/Payload/
+          ditto "$APP_PATH" "build/Payload/$(basename "$APP_PATH")"
           cd build
           /usr/bin/zip -qry SupernovaWatch-unsigned.ipa Payload
           test -s SupernovaWatch-unsigned.ipa
+          /usr/bin/unzip -l SupernovaWatch-unsigned.ipa | head -30
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
