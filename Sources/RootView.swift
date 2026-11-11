@@ -136,9 +136,7 @@ struct WatchScreen: View {
                         Text("No matching reports in the currently connected feeds. This is not evidence that no supernovae have occurred.")
                             .font(.system(size: 12)).foregroundStyle(.white.opacity(0.62))
                     } else {
-                        ForEach(store.supernovaItems.prefix(3)) { item in
-                            FeedRow(item: item)
-                        }
+                        ForEach(store.supernovaItems.prefix(3)) { item in FeedRow(item: item) }
                     }
                 }
                 .padding(16).cardStyle()
@@ -146,6 +144,10 @@ struct WatchScreen: View {
                 if let date = store.lastUpdated {
                     Text("Feeds last checked \(date.formatted(date: .omitted, time: .shortened)). RSS updates are publisher-dependent.")
                         .font(.system(size: 10)).foregroundStyle(.white.opacity(0.42))
+                }
+                if !store.errors.isEmpty {
+                    Text("Some feeds could not be reached: " + store.errors.joined(separator: " • "))
+                        .font(.system(size: 10)).foregroundStyle(.orange.opacity(0.8))
                 }
             }
             .padding(16)
@@ -193,7 +195,7 @@ struct SourcesScreen: View {
                     }.padding(14).cardStyle()
                 }
                 SectionHeading(title: "SPECIALIST REFERENCE PORTALS", caption: "NOT YET API-INTEGRATED")
-                ForEach(ObservatorySources.specialist, id: \.0) { source in
+                ForEach(Array(ObservatorySources.specialist.enumerated()), id: \.offset) { _, source in
                     Link(destination: URL(string: source.1)!) {
                         VStack(alignment: .leading, spacing: 5) {
                             Text(source.0).font(.system(size: 14, weight: .bold)).foregroundStyle(.white)

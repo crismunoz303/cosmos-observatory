@@ -1,5 +1,4 @@
 import Foundation
-import Combine
 
 @MainActor
 final class ObservatoryStore: ObservableObject {
@@ -66,6 +65,7 @@ private final class RSSFeedService: NSObject, XMLParserDelegate {
     private func parse(_ data: Data, source: FeedSource) -> [FeedItem] {
         currentSource = source
         parsed = []
+        XMLParser(data: data).delegate = self
         let parser = XMLParser(data: data)
         parser.delegate = self
         _ = parser.parse()
